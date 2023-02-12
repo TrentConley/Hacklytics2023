@@ -4,19 +4,9 @@ import json
 import pandas as pd
 import datetime
 import time
-
-key = 'e489b910-b0fa-4da3-856f-364b9627b12e'
-# config.py
-API_KEY = "your_secret_api_key"
-
-# main.py
 import config
 
-def use_api():
-    print("Using API key: ", config.API_KEY)
-
-use_api()
-
+key = config.API_KEY
 url = 'https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/listings/historical'
 
 
@@ -53,24 +43,24 @@ current_time = int(time.time())
 
 
 
+def write_to_csv():
+	# Define a list to store the data
+	data = []
 
-# Define a list to store the data
-data = []
+	# Get the data for the past 365 days (1 year)
+	for i in range(365):
+		try:
+			# Get the date for each day in the past 365 days
+			date = current_time - (i * 24 * 60 * 60)
+			# Call the get_data_for_date function with the date
+			data_for_date = get_data_for_date(date)
+			# Append the data to the list
+			data.append(data_for_date)
+		except (json.decoder.JSONDecodeError) as e:
+			print(e)
 
-# Get the data for the past 365 days (1 year)
-for i in range(365):
-	try:
-	    # Get the date for each day in the past 365 days
-		date = current_time - (i * 24 * 60 * 60)
-	    # Call the get_data_for_date function with the date
-		data_for_date = get_data_for_date(date)
-	    # Append the data to the list
-		data.append(data_for_date)
-	except (json.decoder.JSONDecodeError) as e:
-		print(e)
+	# Create a pandas data frame with the data
+	df = pd.DataFrame(data)
 
-# Create a pandas data frame with the data
-df = pd.DataFrame(data)
-
-# Save the data frame to a csv file
-df.to_csv('data.csv', index=False)
+	# Save the data frame to a csv file
+	df.to_csv('data.csv', index=False)
